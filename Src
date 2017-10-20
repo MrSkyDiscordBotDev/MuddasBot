@@ -1,0 +1,151 @@
+import discord
+import asyncio
+import random
+import requests
+import io
+import safygiphy
+
+client = discord.Client()
+g = safygiphy.Giphy()
+Your Discord Name = "Your ID"
+
+players = {}
+
+@client.event
+async def on_ready():
+    print('-----------')
+    print('Eingeloggt als')
+    print(client.user.name)
+    print(client.user.id)
+    print('-----------')
+
+
+@client.event
+async def on_message(message):
+    if message.content.lower().startswith('!muddahelp'):
+        await client.send_message(message.channel, "Musik: ?play <LINK> ?pause ?resume ?quit ?join"
+                                                   " !muddaversion"
+                                                   " !meme1 !meme2 !meme3 !meme4 !meme5 !meme6 !meme7"
+                                                   " !muddapicture"
+                                                   " !muddainvite"
+                                                   " !muddayt"
+                                                   " !muddadisc"
+                                                   " !fun")
+    if message.content.lower().startswith('!muddapicture'):
+        await client.send_message(message.channel, "https://img.webme.com/pic/s/seidi-angler/augly3.jpg")
+
+    if message.content.lower().startswith('!muddainvite'):
+        await client.send_message(message.channel, "https://discordapp.com/oauth2/authorize?client_id=357444831741739019&scope=bot")
+
+    if message.content.lower().startswith('!muddadisc'):
+        await client.send_message(message.channel, "https://discord.gg/QJ96dbG")
+
+    if message.content.lower().startswith('!muddasong'):
+        await client.send_message(message.channel, "?play https://www.youtube.com/watch?v=9MQHjboZcOo")
+
+    if message.content.lower().startswith('!fun'):
+        await client.send_message(message.channel, "THe fun command's: !boobs, !ass, !pussy Game's: !muddacoin")
+
+    if message.content.lower().startswith(''):
+        await client.send_message(message.channel, "http://www.sexygbs.com/sg/sexy-frauen/sexy-frauen_011.jpg")
+
+    if message.content.lower().startswith('!ass'):
+        await client.send_message(message.channel, "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFzzBHH87P0HE3pWp_zGs6h2iREhX3UAb4suQAjtOxK6YH2VIxSw")
+
+    if message.content.lower().startswith('!pussy'):
+        await client.send_message(message.channel, "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcGyVfcDD7I0OiSTuAGVOC_1fRaU6A0tuaTKdN7RIjauZpEXfC6Q")
+
+    if message.content.lower().startswith('!muddaversion'):
+        await client.send_message(message.channel, "The Bot is on the version 1.5")
+
+    if message.content.lower().startswith('!muddacoin'):  # Coinflip 50/50% chance kopf oder zahl
+        choice = random.randint(1, 2)
+        if choice == 1:
+            await client.add_reaction(message, '🔵')
+        if choice == 2:
+            await client.add_reaction(message, '🔴')
+
+    if message.content.startswith('!game') and message.author.id == Marcel:
+        game = message.content[6:]
+        await client.change_presence(game=discord.Game(name=game))
+        await client.send_message(message.channel, "Ich habe meinen Status zu " + game + " geaendert")
+
+    if message.content.lower().startswith('!meme1'):
+        await client.send_message(message.channel, "https://pics.me.me/die-chinesische-mauer-die-deutsche-mauer-13971762.png")
+
+    if message.content.lower().startswith('!meme2'):
+        await client.send_message(message.channel, "https://media.makeameme.org/created/steht-in-deutsch-bnhs8s.jpg")
+
+    if message.content.lower().startswith('!meme3'):
+        await client.send_message(message.channel, "https://www.xdpedia.com/bilders/michelin_m%C3%A4nnchen_462.jpg")
+
+    if message.content.lower().startswith('!meme4'):
+        await client.send_message(message.channel, "https://i.pinimg.com/736x/db/36/25/db36256e07ec7b387654d93bda3fb908.jpg")
+
+    if message.content.lower().startswith('!meme5'):
+        await client.send_message(message.channel, "http://data.whicdn.com/images/55533152/large.png")
+
+    if message.content.lower().startswith('!meme6'):
+        await client.send_message(message.channel, "http://origin.webcdn.theblackdesertonline.net/forum/service_live/monthly_03_2016/spongebob-patrick-squidward-sex-twilight-meme.thumb.jpg.e22fcf4f1509dccadba98abf64c78c4a.jpg")
+
+    if message.content.lower().startswith('!meme7'):
+        await client.send_message(message.channel, "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLfXBGWn_oH1vq9y7PWv0Mt33YpVGjUhUbci4LrFGhOWtS5nuKHQ")
+
+    if message.content.startswith('?join'):
+        try:
+            channel = message.author.voice.voice_channel
+            await client.join_voice_channel(channel)
+        except discord.errors.InvalidArgument:
+            await client.send_message(message.channel, "No Voice channel found!")
+        except Exception as error:
+            await client.send_message(message.channel, "Ein Error: ```{error}```".format(error=error))
+
+    if message.content.startswith('?quit'):
+        try:
+            voice_client = client.voice_client_in(message.server)
+            await voice_client.disconnect()
+        except AttributeError:
+            await client.send_message(message.channel, "I am not connected")
+        except Exception as Hugo:
+            await client.send_message(message.channel, "Ein Error: ```{haus}```".format(haus=Hugo))
+
+    if message.content.startswith('?play '):
+        try:
+            yt_url = message.content[6:]
+            if client.is_voice_connected(message.server):
+                try:
+                    voice = client.voice_client_in(message.server)
+                    players[message.server.id].stop()
+                    player = await voice.create_ytdl_player(yt_url, before_options=" -reconnect 1 -reconnect_streamed 1"
+                                                                                   " -reconnect_delay_max 5")
+                    players[message.server.id] = player
+                    player.start()
+                except Exception as e:
+                    await client.send_message(message.server, "Error: [{error}]".format(error=e))
+
+            if not client.is_voice_connected(message.server):
+                try:
+                    channel = message.author.voice.voice_channel
+                    voice = await client.join_voice_channel(channel)
+                    player = await voice.create_ytdl_player(yt_url, before_options=" -reconnect 1 -reconnect_streamed 1"
+                                                                                   " -reconnect_delay_max 5")
+                    players[message.server.id] = player
+                    player.start()
+                except Exception as error:
+                    await client.send_message(message.channel, "Error: [{error}]".format(error=error))
+        except Exception as e:
+            await client.send_message(message.channel, "Error: [{error}]".format(error=e))
+
+    if message.content.startswith('?pause'):
+        try:
+            players[message.server.id].pause()
+        except Exception as error:
+            await client.send_message(message.channel, "Error: [{error}]".format(error=error))
+    if message.content.startswith('?resume'):
+        try:
+            players[message.server.id].resume()
+        except Exception as error:
+            await client.send_message(message.channel, "Error: [{error}]".format(error=error))
+
+
+client.run('TOKEN')
